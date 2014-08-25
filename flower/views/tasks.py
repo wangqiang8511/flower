@@ -44,3 +44,31 @@ class TasksView(BaseHandler):
                     worker=worker,
                     type=type,
                     state=state)
+
+
+class TasksMatchView(BaseHandler):
+    @web.authenticated
+    def get(self):
+        app = self.application
+        limit = self.get_argument('limit', default=None, type=int)
+        worker = self.get_argument('worker', None)
+        pattern = self.get_argument('pattern', None)
+        state = self.get_argument('state', None)
+
+        worker = worker if worker != 'All' else None
+        pattern = pattern if type != '.*' else None
+        state = state if state != 'All' else None
+
+        tasks = TaskModel.iter_tasks_with_pattern(app, limit=limit, pattern=pattern,
+                                     worker=worker, state=state)
+        workers = WorkersModel.get_workers(app)
+        seen_task_types = TaskModel.seen_task_types(app)
+
+        self.render("tasks.html", tasks=tasks,
+                    task_types=seen_task_types,
+                    all_states=celery.states.ALL_STATES,
+                    workers=workers,
+                    limit=limit,
+                    worker=worker,
+                    type=type,
+                    state=state)

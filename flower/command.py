@@ -48,6 +48,7 @@ define("xheaders", type=bool, default=False,
 define("auto_refresh", default=True, help="refresh dashboards", type=bool)
 define("cookie_secret", type=str, default=None, help="secure cookie secret")
 define("conf", default=settings.CONFIG_FILE, help="configuration file")
+define("app_file", default="tmp/celery_app.txt", help="celery app list file")
 
 
 logger = logging.getLogger(__name__)

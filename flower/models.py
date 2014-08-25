@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from __future__ import with_statement
 
+import re
+
 from celery.events.state import Task as _Task
 
 try:
@@ -122,6 +124,24 @@ class TaskModel(BaseModel):
                 break
 
     @classmethod
+    def iter_tasks_with_pattern(cls, app, limit=None, pattern=None, worker=None, state=None):
+        def match_pattern(name, pattern):
+            return re.search(pattern, name)
+        i = 0
+        events_state = app.events.state
+        for uuid, task in events_state.tasks_by_timestamp():
+            if pattern and not match_pattern(task.name, pattern):
+                continue
+            if worker and task.worker and task.worker.hostname != worker:
+                continue
+            if state and task.state != state:
+                continue
+            yield uuid, task
+            i += 1
+            if i == limit:
+                break
+
+    @classmethod
     def seen_task_types(cls, app):
         return app.events.state.task_types()
 
@@ -147,3 +167,12 @@ class BrokerModel(BaseModel):
                 not self.app.options.broker_api:
             return False
         return True
+
+
+class SchedulesModel(BaseModel):
+    def __init__(self, app):
+        super(SchedulesModel, self).__init__(app)
+
+    @classmethod
+    def get_schedules(cls, app):
+        return app.conf['CELERYBEAT_SCHEDULE']

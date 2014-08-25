@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block navbar %}
+  {% module Template("navbar.html", active_tab="schedules", absolute_url=absolute_url) %}
+{% end %}
+
+{% block container %}
+  <div class="container-fluid">
+    <div class="page-header">
+      <h1>Schedules</h1>
+    </div>
+
+    <table id="schedules-table" class="table table-bordered table-striped">
+      <thead>
+      <tr>
+        <th>App</th>
+        <th>Name</th>
+        <th>Task</th>
+        <th>Args</th>
+        <th>Schedule</th>
+        <th>LastRun</th>
+        <th>Total</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for app in schedules.keys() %}
+        {% for schedule in schedules[app] %}
+        <tr id="{{ url_escape(schedule['name']) }}">
+          <td>{{ app }}</td>
+          <td>{{ schedule['name'] }}</td>
+          <td>{{ schedule['task'] }}</td>
+          <td>{{ schedule['args'] }}</td>
+          <td>{{ repr(schedule['schedule']) }}</td>
+          <td>{{ repr(schedule['last_run_at']) }}</td>
+          <td>{{ repr(schedule['total_run_count']) }}</td>
+        </tr>
+        {% end %}
+      {% end %}
+      </tbody>
+    </table>
+
+  </div>
+{% end %}
